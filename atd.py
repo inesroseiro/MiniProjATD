@@ -3,20 +3,25 @@ import csv
 import math
 import matplotlib.pyplot as plt
 from scipy import interpolate
+from scipy import signal
+
 
 counter = 0
 data = []
 aux = []
+times = []
+
 with open('dataset_ATD_PL7.csv', 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
     for row in spamreader:
         if counter != 0:
+            times.append(counter)
             data.append([row[0],float(row[1])])
             aux.append(float(row[1]))
         counter = counter+1 
 
 values = np.array(aux)
-
+times = np.array(times)
 #cria uma matriz que poe a True se nao for nan, e a False se for
 ok = -np.isnan(values)
 #cria uma matriz com numeros de 0 a 364
@@ -98,23 +103,41 @@ aux_dps = np.array(dps)
 dps_value = np.mean(aux_dps)
 print("desvio padrao semestral: %s" % (dps_value))
 
-#outliers
+#outliers por mes
 values_outliers = np.copy(values)
-print("vo: ",values_outliers)
-
-for i in range(len(array_medias)):
-    for j in range(len(values_outliers)):
-        if (abs(values_outliers[j]-array_medias[i])>3*array_desviop[i]):
-            values_outliers[j] = array_medias[i]+ 2.5*array_desviop[i]
+for i in range(len(values_outliers)):
+    for j in range(len(array_medias)):
+        if(abs(values[i]-array_medias[j]) > 3*array_desviop[j]):
+            if(values[i] > array_medias[j]):
+                values_outliers[i] = array_medias[j]+ 2.5*array_desviop[j]
+            else:
+                values_outliers[i] = array_medias[j]- 2.5*array_desviop[j]
+#outliers por ano
+"""
+for i in range(len(values_outliers)):
+    if(abs(values[i]-media) > 3*dpadrao):
+        if(values[i] > media):
+            values_outliers[i] =  media + 2.5*dpadrao
+            print(str(values[i]) + " " + str(media) + " " + str(dpadrao))
         else:
-            values_outliers[j] = array_medias[i]- 2.5*array_desviop[i]
-
-
-
-
-
-
+            values_outliers[i] = media - 2.5 * dpadrao
+            print(str(values[i]) + " " + str(media) + " " + str(dpadrao))
+"""
+#detrend linear
+values_detrend = np.copy(values)
+values_detrend= signal.detrend(values_detrend,-1,type='linear', bp=0)
 '''
+#detrend constant
+values_detrend = np.copy(values)
+values_detrend= signal.detrend(values_detrend,-1,type='constant', bp=0)
+'''
+#tendencia da serie parametrica
+#tendencia = values_outliers - values_detrend
+
+#polyfit
+p1 = np.polyfit(times, values, 2)
+print(len(p1))
+p2 = np.polyval(p1,times)
 
 
 #mostra grafico sem outliers
@@ -124,24 +147,40 @@ lines = plt.plot(values)
 plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
 plt.xticks(xmarks)
-plt.axis([0, 370, 0, 40])
+plt.axis([0, 370, -20, 40])
 plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
-'''
-'''
+
+
 #mostra grafico com outliers
 plt.figure('DataSet Graph\n')
 plt.title('DataSet Graph com Outliers\n')
 lines = plt.plot(values_outliers)
 plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
+
+lines2 = plt.plot(values_detrend)
+plt.setp(lines2, 'color', 'b', 'linewidth', 1.0)
+
 xmarks=[i for i in range(0,364+1,15)]
 plt.xticks(xmarks)
-plt.axis([0, 370, 0, 40])
+plt.axis([0, 370, -20, 40])
 plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
-'''
 
 
+#mostra grafico polyfit
+plt.figure('DataSet Graph\n')
+plt.title('DataSet Graph Polyfit\n')
+lines2 = plt.plot(values_outliers)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+lines = plt.plot(p2)
+plt.setp(lines, 'color', 'g', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
 
