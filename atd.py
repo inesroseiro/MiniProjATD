@@ -103,15 +103,111 @@ aux_dps = np.array(dps)
 dps_value = np.mean(aux_dps)
 print("desvio padrao semestral: %s" % (dps_value))
 
-#outliers por mes
 values_outliers = np.copy(values)
+#outliers mes a mes
 for i in range(len(values_outliers)):
-    for j in range(len(array_medias)):
-        if(abs(values[i]-array_medias[j]) > 3*array_desviop[j]):
+    if i < 31:
+        if(abs(values[i]-array_medias[0]) > 3*array_desviop[0]):
             if(values[i] > array_medias[j]):
-                values_outliers[i] = array_medias[j]+ 2.5*array_desviop[j]
+                values_outliers[i] = array_medias[0]+ 2.5*array_desviop[0]
+                print (values_outliers[i] ,"-" ,i) 
             else:
-                values_outliers[i] = array_medias[j]- 2.5*array_desviop[j]
+                values_outliers[i] = array_medias[0]- 2.5*array_desviop[0]
+                print (values_outliers[i] , "-" ,i) 
+
+    elif i >30 and i<59:
+        if(abs(values[i]-array_medias[1]) > 3*array_desviop[1]):
+            if(values[i] > array_medias[1]):
+                values_outliers[i] = array_medias[1]+ 2.5*array_desviop[1]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[1]- 2.5*array_desviop[1]
+                print (values_outliers[i] , "-" ,i) 
+    elif i >58 and i<90:
+        if(abs(values[i]-array_medias[2]) > 3*array_desviop[2]):
+            if(values[i] > array_medias[2]):
+                values_outliers[i] = array_medias[2]+ 2.5*array_desviop[2]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[2]- 2.5*array_desviop[2]
+                print (values_outliers[i] , "-" ,i) 
+    elif i>89 and i<120:
+        if(abs(values[i]-array_medias[3]) > 3*array_desviop[3]):
+            if(values[i] > array_medias[3]):
+                values_outliers[i] = array_medias[3]+ 2.5*array_desviop[3]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[3]- 2.5*array_desviop[3]
+                print (values_outliers[i] , "-" ,i) 
+
+    elif i>119 and i<151:
+        if(abs(values[i]-array_medias[4]) > 3*array_desviop[4]):
+            if(values[i] > array_medias[4]):
+                values_outliers[i] = array_medias[4]+ 2.5*array_desviop[4]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[4]- 2.5*array_desviop[4]
+                print (values_outliers[i] , "-" ,i) 
+
+    elif i>150 and i<181:
+        if(abs(values[i]-array_medias[5]) > 3*array_desviop[5]):
+            if(values[i] > array_medias[5]):
+                values_outliers[i] = array_medias[5]+ 2.5*array_desviop[5]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[5]- 2.5*array_desviop[5]
+                print (values_outliers[i] , "-" ,i) 
+    elif i>180 and i<212:
+        if(abs(values[i]-array_medias[6]) > 3*array_desviop[6]):
+            if(values[i] > array_medias[6]):
+                values_outliers[i] = array_medias[6]+ 2.5*array_desviop[6]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[6]- 2.5*array_desviop[6]
+                print (values_outliers[i] , "-" ,i) 
+    elif i>211 and i<243:
+        if(abs(values[i]-array_medias[7]) > 3*array_desviop[7]):
+            if(values[i] > array_medias[7]):
+                values_outliers[i] = array_medias[7]+ 2.5*array_desviop[7]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[7]- 2.5*array_desviop[7]
+                print (values_outliers[i] , "-" ,i) 
+    elif i>242 and i<273:
+        if(abs(values[i]-array_medias[8]) > 3*array_desviop[8]):
+            if(values[i] > array_medias[j]):
+                values_outliers[i] = array_medias[8]+ 2.5*array_desviop[8]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[8]- 2.5*array_desviop[8]
+                print (values_outliers[i] , "-" ,i) 
+    elif i>272 and i<304:
+        if(abs(values[i]-array_medias[9]) > 3*array_desviop[9]):
+            if(values[i] > array_medias[9]):
+                values_outliers[i] = array_medias[9]+ 2.5*array_desviop[9]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[9]- 2.5*array_desviop[9]
+                print (values_outliers[i] , "-" ,i) 
+
+    elif i>303 and i<334:
+        if(abs(values[i]-array_medias[10]) > 3*array_desviop[10]):
+            if(values[i] > array_medias[10]):
+                values_outliers[i] = array_medias[10]+ 2.5*array_desviop[10]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[10]- 2.5*array_desviop[10]
+                print (values_outliers[i] , "-" ,i) 
+
+    elif i>333 and i<366:
+        if(abs(values[i]-array_medias[11]) > 3*array_desviop[11]):
+            if(values[i] > array_medias[11]):
+                values_outliers[i] = array_medias[11]+ 2.5*array_desviop[11]
+                print (values_outliers[i] , "-" ,i) 
+            else:
+                values_outliers[i] = array_medias[11]- 2.5*array_desviop[11]
+                print (values_outliers[i] , "-" ,i) 
+
 #outliers por ano
 """
 for i in range(len(values_outliers)):
@@ -136,7 +232,6 @@ values_detrend= signal.detrend(values_detrend,-1,type='constant', bp=0)
 
 #polyfit
 p1 = np.polyfit(times, values, 2)
-print(len(p1))
 p2 = np.polyval(p1,times)
 
 
