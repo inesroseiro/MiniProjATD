@@ -11,7 +11,7 @@ data = []
 aux = []
 times = []
 
-with open('dataset_ATD_PL7.csv', 'rb') as csvfile:
+with open('dataset_ATD_PL5.csv', 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
     for row in spamreader:
         if counter != 0:
@@ -219,6 +219,7 @@ for i in range(len(values_outliers)):
             values_outliers[i] = media - 2.5 * dpadrao
             print(str(values[i]) + " " + str(media) + " " + str(dpadrao))
 """
+'''
 #detrend linear
 values_detrend = np.copy(values)
 values_detrend= signal.detrend(values_detrend,-1,type='linear', bp=0)
@@ -226,14 +227,30 @@ values_detrend= signal.detrend(values_detrend,-1,type='linear', bp=0)
 #detrend constant
 values_detrend = np.copy(values)
 values_detrend= signal.detrend(values_detrend,-1,type='constant', bp=0)
-'''
-#tendencia da serie parametrica
-#tendencia = values_outliers - values_detrend
+
+
 
 #polyfit
 p1 = np.polyfit(times, values, 2)
 p2 = np.polyval(p1,times)
+values_ro_t2 = values - p2
 
+#2.7 e 2.8 trimestral sazonalidade
+trim = np.arange(0,122,1)
+np.matlib.repmat(trim, 2, 1)
+
+
+#mostra grafico 2.3, 2.4, 2.5
+plt.figure('DataSet Graph\n')
+plt.title('Serie sem trend de Grau 2\n')
+lines = plt.plot(values_ro_t2)
+plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
 
 #mostra grafico sem outliers
 plt.figure('DataSet Graph\n')
