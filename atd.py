@@ -221,17 +221,14 @@ for i in range(len(values_outliers)):
             print(str(values[i]) + " " + str(media) + " " + str(dpadrao))
 """
 
-#detrend linear
-values_detrend = np.copy(values)
-values_detrend= signal.detrend(values_detrend,-1,type='linear', bp=0)
+#detrend linear - serie sem tendencia e grau 1 
+values_detrend_linear = np.copy(values)
+values_detrend_linear = signal.detrend(values_detrend_linear,-1,type='linear', bp=0)
 
-'''
 #detrend constant
-values_detrend = np.copy(values)
-print values_detrend
-values_detrend= signal.detrend(values_detrend,-1,type='constant', bp=0)
-print values_detrend
-'''
+values_detrend_constant = np.copy(values)
+values_detrend_constant = signal.detrend(values_detrend_constant,-1,type='constant', bp=0)
+
 #polyfit
 p1 = np.polyfit(times, values, 2)
 p2 = np.polyval(p1,times)
@@ -246,7 +243,7 @@ for i in range(91):
 print trim
 
 
-'''
+
 #mostra grafico sem outliers
 plt.figure('DataSet Graph\n')
 plt.title('DataSet Graph sem Outliers\n')
@@ -266,7 +263,7 @@ plt.title('DataSet Graph com Outliers\n')
 lines = plt.plot(values_outliers)
 plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
 
-lines2 = plt.plot(values_detrend)
+lines2 = plt.plot(values_outliers)
 plt.setp(lines2, 'color', 'b', 'linewidth', 1.0)
 
 xmarks=[i for i in range(0,364+1,15)]
@@ -279,11 +276,9 @@ plt.show()
 
 #mostra grafico polyfit
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph Polyfit\n')
-lines2 = plt.plot(values_outliers)
+plt.title('DataSet Graph com Polyfit\n')
+lines2 = plt.plot(values_ro_t2)
 plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
-lines = plt.plot(p2)
-plt.setp(lines, 'color', 'g', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
 plt.xticks(xmarks)
 plt.axis([0, 370, -20, 40])
@@ -291,15 +286,27 @@ plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
 
-#mostra grafico 2.3, 2.4, 2.5
+#mostra grafico detrend linear
 plt.figure('DataSet Graph\n')
-plt.title('Serie sem trend de Grau 2\n')
-lines = plt.plot(values_ro_t2)
-plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
+plt.title('DataSet Graph com Detrend Linear\n')
+lines2 = plt.plot(values_detrend_linear)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
 plt.xticks(xmarks)
 plt.axis([0, 370, -20, 40])
 plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
-'''
+
+#mostra grafico detrend constante
+plt.figure('DataSet Graph\n')
+plt.title('DataSet Graph com Detrend Constante\n')
+lines2 = plt.plot(values_detrend_constant)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+
