@@ -223,30 +223,45 @@ for i in range(len(values_outliers)):
 
 #detrend linear - serie sem tendencia e grau 1 
 values_detrend_linear = np.copy(values)
-values_detrend_linear = signal.detrend(values_detrend_linear,-1,type='linear', bp=0)
+values_detrend_linear = signal.detrend(values,-1,type='linear', bp=0)
 
 #detrend constant
 values_detrend_constant = np.copy(values)
-values_detrend_constant = signal.detrend(values_detrend_constant,-1,type='constant', bp=0)
+values_detrend_constant =signal.detrend(values,-1,type='constant', bp=0)
 
 #polyfit
 p1 = np.polyfit(times, values, 2)
 p2 = np.polyval(p1,times)
+
+#serie sem a tendencia
 values_ro_t2 = values - p2
 
-#2.7 e 2.8 trimestral sazonalidade
+#2.7 e 2.8  sazonalidade trimestral
 trim = np.arange(0,91,1)
-#ho = np.matlib.repmat(trim, 1, 4)
 
 for i in range(91):
     trim[i] =  (values_ro_t2[i] + values_ro_t2[i+91] + values_ro_t2[i+91*2] + values_ro_t2[i+91*3]) /4   
-print trim
+
+ho = np.matlib.repmat(trim, 1, 4)
+auxiliar = []
+for i in range(len(ho)):
+    for j in range(len(ho[i])):
+        auxiliar.append(ho[i][j])
+
+auxiliar.append(0)
+#serie sem sazonalidade
+auxiliar2 = np.array(auxiliar)
+print auxiliar2
+
+#sazonalidade da serie
+result = np.subtract(values_outliers, auxiliar2)
 
 
 
+#----------------------------------------- graficos ---------------------------------------------------
 #mostra grafico sem outliers
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph sem Outliers\n')
+plt.title('Serie sem Outliers\n')
 lines = plt.plot(values)
 plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
@@ -256,29 +271,13 @@ plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
 
-
 #mostra grafico com outliers
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph com Outliers\n')
-lines = plt.plot(values_outliers)
-plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
-
+plt.title('Serie com Outliers\n')
+#lines = plt.plot(values)
+#plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
 lines2 = plt.plot(values_outliers)
 plt.setp(lines2, 'color', 'b', 'linewidth', 1.0)
-
-xmarks=[i for i in range(0,364+1,15)]
-plt.xticks(xmarks)
-plt.axis([0, 370, -20, 40])
-plt.ylabel('Samples\n')
-plt.xlabel('\nNumber of Samples')
-plt.show()
-
-
-#mostra grafico polyfit
-plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph com Polyfit\n')
-lines2 = plt.plot(values_ro_t2)
-plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
 plt.xticks(xmarks)
 plt.axis([0, 370, -20, 40])
@@ -288,7 +287,7 @@ plt.show()
 
 #mostra grafico detrend linear
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph com Detrend Linear\n')
+plt.title('Serie sem tendencia - grau 1 - linear\n')
 lines2 = plt.plot(values_detrend_linear)
 plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
@@ -300,7 +299,7 @@ plt.show()
 
 #mostra grafico detrend constante
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph com Detrend Constante\n')
+plt.title('Serie sem tendencia - grau 1 - constante\n')
 lines2 = plt.plot(values_detrend_constant)
 plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
@@ -310,3 +309,50 @@ plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
 
+#mostra grafico polyfit
+plt.figure('DataSet Graph\n')
+plt.title('Serie com a componente da tendencia de grau 2\n')
+lines2 = plt.plot(p2)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+
+#mostra grafico sem componente da tendencia
+plt.figure('DataSet Graph\n')
+plt.title('Serie sem a componente da tendencia de grau 2\n')
+lines2 = plt.plot(values_ro_t2)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+
+#mostra grafico sem sazonalidade
+plt.figure('DataSet Graph\n')
+plt.title('Serie sem sazonalidade\n')
+lines2 = plt.plot(auxiliar2)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+
+#mostra grafico sazonalidade da serie
+plt.figure('DataSet Graph\n')
+plt.title('Sazonalidade - serie\n')
+lines2 = plt.plot(result)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
