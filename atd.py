@@ -4,6 +4,7 @@ import math
 import matplotlib.pyplot as plt
 from scipy import interpolate
 from scipy import signal
+import numpy.matlib
 
 
 counter = 0
@@ -219,39 +220,33 @@ for i in range(len(values_outliers)):
             values_outliers[i] = media - 2.5 * dpadrao
             print(str(values[i]) + " " + str(media) + " " + str(dpadrao))
 """
-'''
+
 #detrend linear
 values_detrend = np.copy(values)
 values_detrend= signal.detrend(values_detrend,-1,type='linear', bp=0)
+
 '''
 #detrend constant
 values_detrend = np.copy(values)
+print values_detrend
 values_detrend= signal.detrend(values_detrend,-1,type='constant', bp=0)
-
-
-
+print values_detrend
+'''
 #polyfit
 p1 = np.polyfit(times, values, 2)
 p2 = np.polyval(p1,times)
 values_ro_t2 = values - p2
 
 #2.7 e 2.8 trimestral sazonalidade
-trim = np.arange(0,122,1)
-np.matlib.repmat(trim, 2, 1)
+trim = np.arange(0,91,1)
+#ho = np.matlib.repmat(trim, 1, 4)
+
+for i in range(91):
+    trim[i] =  (values_ro_t2[i] + values_ro_t2[i+91] + values_ro_t2[i+91*2] + values_ro_t2[i+91*3]) /4   
+print trim
 
 
-#mostra grafico 2.3, 2.4, 2.5
-plt.figure('DataSet Graph\n')
-plt.title('Serie sem trend de Grau 2\n')
-lines = plt.plot(values_ro_t2)
-plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
-xmarks=[i for i in range(0,364+1,15)]
-plt.xticks(xmarks)
-plt.axis([0, 370, -20, 40])
-plt.ylabel('Samples\n')
-plt.xlabel('\nNumber of Samples')
-plt.show()
-
+'''
 #mostra grafico sem outliers
 plt.figure('DataSet Graph\n')
 plt.title('DataSet Graph sem Outliers\n')
@@ -296,3 +291,15 @@ plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
 
+#mostra grafico 2.3, 2.4, 2.5
+plt.figure('DataSet Graph\n')
+plt.title('Serie sem trend de Grau 2\n')
+lines = plt.plot(values_ro_t2)
+plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+'''
