@@ -12,7 +12,7 @@ data = []
 aux = []
 times = []
 
-with open('dataset_ATD_PL5.csv', 'rb') as csvfile:
+with open('dataset_ATD_PL5.csv', 'r') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
     for row in spamreader:
         if counter != 0:
@@ -24,10 +24,10 @@ with open('dataset_ATD_PL5.csv', 'rb') as csvfile:
 values = np.array(aux)
 times = np.array(times)
 #cria uma matriz que poe a True se nao for nan, e a False se for
-ok = -np.isnan(values)
+ok = ~np.isnan(values)
 #cria uma matriz com numeros de 0 a 364
 xp = ok.ravel().nonzero()[0]
-fp = values[-np.isnan(values)]
+fp = values[~np.isnan(values)]
 x  = np.isnan(values).ravel().nonzero()[0]
 #interpolacao
 values[np.isnan(values)] = np.interp(x, xp, fp)
@@ -210,24 +210,16 @@ for i in range(len(values_outliers)):
                 print (values_outliers[i] , "-" ,i) 
 
 #outliers por ano
-"""
-for i in range(len(values_outliers)):
-    if(abs(values[i]-media) > 3*dpadrao):
-        if(values[i] > media):
-            values_outliers[i] =  media + 2.5*dpadrao
-            print(str(values[i]) + " " + str(media) + " " + str(dpadrao))
-        else:
-            values_outliers[i] = media - 2.5 * dpadrao
-            print(str(values[i]) + " " + str(media) + " " + str(dpadrao))
-"""
 
 #detrend linear - serie sem tendencia e grau 1 
 values_detrend_linear = np.copy(values)
 values_detrend_linear = signal.detrend(values_detrend_linear,-1,type='linear', bp=0)
 
 #detrend constant
-values_detrend_constant = np.copy(values)
-values_detrend_constant = signal.detrend(values_detrend_constant,-1,type='constant', bp=0)
+#values_detrend_constant = np.copy(values)
+values_detrend_constant = signal.detrend(values)
+print(values_detrend_constant)
+#values_detrend_constant = signal.detrend(values_detrend_constant,-1,type='constant', bp=0)
 
 #polyfit
 p1 = np.polyfit(times, values, 2)
@@ -236,17 +228,38 @@ values_ro_t2 = values - p2
 
 #2.7 e 2.8 trimestral sazonalidade
 trim = np.arange(0,91,1)
-#ho = np.matlib.repmat(trim, 1, 4)
 
 for i in range(91):
-    trim[i] =  (values_ro_t2[i] + values_ro_t2[i+91] + values_ro_t2[i+91*2] + values_ro_t2[i+91*3]) /4   
-print trim
+    trim[i] =  (values_ro_t2[i] + values_ro_t2[i+91] + values_ro_t2[i+91*2] + values_ro_t2[i+91*3]) /4 
 
+trim = np.matlib.repmat(trim, 1, 4)
+trim2 = []
+for i in range(len(trim)):
+    for j in range(len(trim[i])):
+        trim2.append(trim[i][j])
+trim2= np.array(trim2)
 
+#Sem sazonalidade
+#fazendo batota (o trim so tem 364 valores e os nosso values têm 365)
+values_ro_t2_s = []
+for i in range(364):
+    values_ro_t2_s.append(values_ro_t2[i])
+
+values_ro_t2_s = np.array(values_ro_t2_s)
+values_sem_sazonalidade = values_ro_t2_s - trim2
+
+#sem as componentes irregulares
+#fazendo batota again
+values_ro_t2_364 = []
+for i in range(364):
+    values_ro_t2_364.append(values_ro_t2[i])
+
+values_ro_t2_364 = np.array(values_ro_t2_364)
+values_sem_irregulares = values_ro_t2_364 - values_ro_t2_s - trim2
 
 #mostra grafico sem outliers
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph sem Outliers\n')
+plt.title('DataSet Graph Values\n')
 lines = plt.plot(values)
 plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
@@ -259,7 +272,7 @@ plt.show()
 
 #mostra grafico com outliers
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph com Outliers\n')
+plt.title('DataSet Graph sem Outliers\n')
 lines = plt.plot(values_outliers)
 plt.setp(lines, 'color', 'r', 'linewidth', 1.0)
 
@@ -309,4 +322,42 @@ plt.axis([0, 370, -20, 40])
 plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
+
+#Sem sazonalidade (se calhar é preciso mudar)
+plt.figure('DataSet Graph\n')
+plt.title('DataSet Graph sem Sazonalidade\n')
+lines2 = plt.plot(values_sem_sazonalidade)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+
+#Componente da Sazonalidade
+plt.figure('DataSet Graph\n')
+plt.title('DataSet Graph Sazonalidade\n')
+lines2 = plt.plot(trim2)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+
+
+#Sem irregulares (se calhar é preciso mudar)
+plt.figure('DataSet Graph\n')
+plt.title('DataSet Graph sem irregularidades\n')
+lines2 = plt.plot(values_sem_irregulares)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+
 
