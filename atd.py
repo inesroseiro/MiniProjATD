@@ -1,16 +1,21 @@
+import statsmodels as sm
 import numpy as np
 import csv
 import math
 import matplotlib.pyplot as plt
 from scipy import interpolate
 from scipy import signal
+from scipy import stats, linalg
 import numpy.matlib
+from statsmodels.tsa.stattools import adfuller
+import statsmodels.tsa as sm
 
 
 counter = 0
 data = []
 aux = []
 times = []
+
 
 with open('dataset_ATD_PL5.csv', 'r') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
@@ -209,22 +214,20 @@ for i in range(len(values_outliers)):
                 values_outliers[i] = array_medias[11]- 2.5*array_desviop[11]
                 print (values_outliers[i] , "-" ,i) 
 
-#outliers por ano
-
 #detrend linear - serie sem tendencia e grau 1 
-values_detrend_linear = np.copy(values)
-values_detrend_linear = signal.detrend(values,-1,type='linear', bp=0)
+values_detrend_linear = np.copy(values_outliers)
+values_detrend_linear = signal.detrend(values_outliers,-1,type='linear', bp=0)
 
 #detrend constant
-values_detrend_constant = np.copy(values)
-values_detrend_constant =signal.detrend(values,-1,type='constant', bp=0)
+values_detrend_constant = np.copy(values_outliers)
+values_detrend_constant =signal.detrend(values_outliers,-1,type='constant', bp=0)
 
 #polyfit
-p1 = np.polyfit(times, values, 2)
+p1 = np.polyfit(times, values_outliers, 2)
 p2 = np.polyval(p1,times)
 
 #serie sem a tendencia
-values_ro_t2 = values - p2
+values_ro_t2 = values_outliers - p2
 
 #2.7 e 2.8  sazonalidade trimestral
 trim = np.arange(0,91,1)
@@ -239,18 +242,50 @@ for i in range(len(ho)):
         auxiliar.append(ho[i][j])
 
 auxiliar.append(0)
-#serie sem sazonalidade
 auxiliar = np.array(auxiliar)
 
-#sazonalidade da serie
+#sem sazonalidade
 values_sem_sazonalidade = np.subtract(values_outliers, auxiliar)
+
+#componente sazonal
+saz = np.subtract(values_outliers,values_sem_sazonalidade)
 
 
 #sem as componentes irregulares
 values_sem_irregulares = np.subtract(values_outliers, values_sem_sazonalidade)
-#acho que ta tudo
 
+#componente irregular
+irregularidade = np.subtract(values_outliers,values_sem_irregulares)
 
+#3.1
+N = len(values_outliers)
+t = np.arange(0,91,1) #escala temporal
+tt = np.arange(0,4*91,1) #escala temporal para previsao
+
+#teste de estacionaridade da serie regularizada
+result = adfuller(values_outliers,1)
+print('ADF Statistic: %f' % result[0])
+print('p-value: %f' % result[1])
+print('Critical Values:')
+for key, value in result[4].items():
+	print('\t%s: %.3f' % (key, value))
+print result
+
+#3.3 
+#auto correlation
+y = saz - np.mean(saz)
+norm = np.sum(y ** 2)
+correlated = np.correlate(y, y, mode='full')/norm
+#falta par corr
+
+#3.5
+NA1_ar =6
+#modelo AR 
+#model1_AR = sm.ar_model.AR(values_outliers, dates=None, freq=None, missing='none')
+
+#3.6 - siimulacao modelo AR
+
+'''
 #----------------------------------------- graficos ---------------------------------------------------
 #mostra grafico sem outliers
 plt.figure('DataSet Graph\n')
@@ -329,7 +364,7 @@ plt.show()
 
 #mostra grafico componente sazonalidade
 plt.figure('DataSet Graph\n')
-plt.title('Serie sem sazonalidade\n')
+plt.title('Componente sazonalidade\n')
 lines2 = plt.plot(auxiliar)
 plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
@@ -341,7 +376,7 @@ plt.show()
 
 #Sem sazonalidade
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph sem Sazonalidade\n')
+plt.title('Serie sem Sazonalidade\n')
 lines2 = plt.plot(values_sem_sazonalidade)
 plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
@@ -354,7 +389,7 @@ plt.show()
 
 #Sem irregulares
 plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph sem irregularidades\n')
+plt.title('Serie sem irregularidades\n')
 lines2 = plt.plot(values_sem_irregulares)
 plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
@@ -364,4 +399,26 @@ plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
 
+#Componente irregular
+plt.figure('DataSet Graph\n')
+plt.title('Componente irregular\n')
+lines2 = plt.plot(irregularidade)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
+'''
+plt.figure('DataSet Graph\n')
+plt.title('FAC\n')
+lines2 = plt.plot(correlated)
+plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
+xmarks=[i for i in range(0,364+1,15)]
+plt.xticks(xmarks)
+plt.axis([0, 370, -20, 40])
+plt.ylabel('Samples\n')
+plt.xlabel('\nNumber of Samples')
+plt.show()
 
