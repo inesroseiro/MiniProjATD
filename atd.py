@@ -230,51 +230,25 @@ values_ro_t2 = values - p2
 trim = np.arange(0,91,1)
 
 for i in range(91):
-    trim[i] =  (values_ro_t2[i] + values_ro_t2[i+91] + values_ro_t2[i+91*2] + values_ro_t2[i+91*3]) /4 
+    trim[i] =  (values_ro_t2[i] + values_ro_t2[i+91] + values_ro_t2[i+91*2] + values_ro_t2[i+91*3]) /4
 
-trim = np.matlib.repmat(trim, 1, 4)
-trim2 = []
-for i in range(len(trim)):
-    for j in range(len(trim[i])):
-        trim2.append(trim[i][j])
-trim2= np.array(trim2)
-
-'''
-
-    trim[i] =  (values_ro_t2[i] + values_ro_t2[i+91] + values_ro_t2[i+91*2] + values_ro_t2[i+91*3]) /4   
-
-ho = np.matlib.repmat(trim, 1, 4)
 auxiliar = []
+ho = np.matlib.repmat(trim, 1, 4)
 for i in range(len(ho)):
     for j in range(len(ho[i])):
         auxiliar.append(ho[i][j])
 
 auxiliar.append(0)
 #serie sem sazonalidade
-auxiliar2 = np.array(auxiliar)
-print auxiliar2
+auxiliar = np.array(auxiliar)
 
 #sazonalidade da serie
-result = np.subtract(values_outliers, auxiliar2)
-'''
+values_sem_sazonalidade = np.subtract(values_outliers, auxiliar)
 
-#Sem sazonalidade
-#fazendo batota (o trim so tem 364 valores e os nosso values têm 365)
-values_ro_t2_s = []
-for i in range(364):
-    values_ro_t2_s.append(values_ro_t2[i])
-
-values_ro_t2_s = np.array(values_ro_t2_s)
-values_sem_sazonalidade = values_ro_t2_s - trim2
 
 #sem as componentes irregulares
-#fazendo batota again
-values_ro_t2_364 = []
-for i in range(364):
-    values_ro_t2_364.append(values_ro_t2[i])
-
-values_ro_t2_364 = np.array(values_ro_t2_364)
-values_sem_irregulares = values_ro_t2_364 - values_ro_t2_s - trim2
+values_sem_irregulares = np.subtract(values_outliers, values_sem_sazonalidade)
+#acho que ta tudo
 
 
 #----------------------------------------- graficos ---------------------------------------------------
@@ -353,10 +327,10 @@ plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
 
-#mostra grafico sem sazonalidade
+#mostra grafico componente sazonalidade
 plt.figure('DataSet Graph\n')
 plt.title('Serie sem sazonalidade\n')
-lines2 = plt.plot(auxiliar2)
+lines2 = plt.plot(auxiliar)
 plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
 xmarks=[i for i in range(0,364+1,15)]
 plt.xticks(xmarks)
@@ -365,7 +339,7 @@ plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
 
-#Sem sazonalidade (se calhar é preciso mudar)
+#Sem sazonalidade
 plt.figure('DataSet Graph\n')
 plt.title('DataSet Graph sem Sazonalidade\n')
 lines2 = plt.plot(values_sem_sazonalidade)
@@ -377,20 +351,8 @@ plt.ylabel('Samples\n')
 plt.xlabel('\nNumber of Samples')
 plt.show()
 
-#Componente da Sazonalidade
-plt.figure('DataSet Graph\n')
-plt.title('DataSet Graph Sazonalidade\n')
-lines2 = plt.plot(trim2)
-plt.setp(lines2, 'color', 'r', 'linewidth', 1.0)
-xmarks=[i for i in range(0,364+1,15)]
-plt.xticks(xmarks)
-plt.axis([0, 370, -20, 40])
-plt.ylabel('Samples\n')
-plt.xlabel('\nNumber of Samples')
-plt.show()
 
-
-#Sem irregulares (se calhar é preciso mudar)
+#Sem irregulares
 plt.figure('DataSet Graph\n')
 plt.title('DataSet Graph sem irregularidades\n')
 lines2 = plt.plot(values_sem_irregulares)
